@@ -1,0 +1,46 @@
+rules:
+  - id: structure.multiple-classes-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      This file defines multiple module-level classes (`$NAME1` and `$NAME2`).
+      The "one public type per file" rule requires each public class to live
+      in its own file. Move `$NAME2` to a separate module.
+    patterns:
+      - pattern-either:
+          - pattern: |
+              class $NAME1(...):
+                  ...
+              ...
+              class $NAME2(...):
+                  ...
+          - pattern: |
+              class $NAME1:
+                  ...
+              ...
+              class $NAME2:
+                  ...
+          - pattern: |
+              class $NAME1(...):
+                  ...
+              ...
+              class $NAME2:
+                  ...
+          - pattern: |
+              class $NAME1:
+                  ...
+              ...
+              class $NAME2(...):
+                  ...
+      - metavariable-regex:
+          metavariable: $NAME1
+          regex: ^[A-Z]
+      - metavariable-regex:
+          metavariable: $NAME2
+          regex: ^[A-Z]
+    metadata:
+      category: structure
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        1つのファイルに複数のモジュールレベルクラスが定義されています。
+        公開クラスごとに別ファイルに分離してください。

@@ -1,0 +1,28 @@
+rules:
+  - id: structure.multiple-exported-classes-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      This file exports multiple classes (`$NAME1` and `$NAME2`). The "one
+      public type per file" rule requires each exported class to live in its
+      own file. Move `$NAME2` to a separate module.
+    pattern: |
+      export class $NAME1 { ... }
+      ...
+      export class $NAME2 { ... }
+    metadata:
+      category: structure
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        1つのファイルに複数のエクスポートされたクラスが定義されています。
+        公開型ごとに別ファイルに分離してください。
+
+  - id: structure.multiple-exported-interfaces-typescript
+    languages: [typescript]
+    severity: WARNING
+    message: >-
+      This file exports multiple interfaces. Move one to a separate module.
+    pattern-regex: "(?s)export\\s+interface\\s+\\w+\\s*\\{[^}]*\\}.*export\\s+interface\\s+\\w+\\s*\\{"
+    metadata:
+      category: structure
+      rule-origin: ai-tools/COMMON.md

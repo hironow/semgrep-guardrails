@@ -1,0 +1,41 @@
+rules:
+  - id: naming.ambiguous-suffix-struct-go
+    languages: [go]
+    severity: WARNING
+    message: >-
+      Type `$NAME` uses an ambiguous suffix. Avoid Manager, Util, Facade,
+      Service, Runtime, Engine in new type names. Consider a more specific
+      name based on its responsibility:
+      Data -> Registry/Catalog/Store,
+      Selection -> Policy/Selector/Router,
+      Coordination -> Coordinator/Dispatcher/Controller,
+      Creation -> Factory/Builder,
+      Transformation -> Adapter/Bridge/Mapper,
+      Execution -> Executor/Scheduler/Evaluator.
+    patterns:
+      - pattern: type $NAME struct { ... }
+      - metavariable-regex:
+          metavariable: $NAME
+          regex: ^[A-Z].*(?:Manager|Util|Facade|Service|Runtime|Engine)$
+    metadata:
+      category: naming
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        曖昧なサフィックス(Manager, Util, Facade, Service, Runtime, Engine)を
+        持つ型名を検出します。責務に応じた具体的な命名を使用してください。
+
+  - id: naming.ambiguous-suffix-interface-go
+    languages: [go]
+    severity: WARNING
+    message: >-
+      Interface `$NAME` uses an ambiguous suffix. Avoid Manager, Util, Facade,
+      Service, Runtime, Engine in new type names. Use a name that reflects
+      the specific responsibility.
+    patterns:
+      - pattern: type $NAME interface { ... }
+      - metavariable-regex:
+          metavariable: $NAME
+          regex: ^[A-Z].*(?:Manager|Util|Facade|Service|Runtime|Engine)$
+    metadata:
+      category: naming
+      rule-origin: ai-tools/COMMON.md

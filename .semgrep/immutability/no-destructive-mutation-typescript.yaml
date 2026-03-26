@@ -1,0 +1,79 @@
+rules:
+  - id: immutability.no-array-push-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      `$X.push(...)` mutates the array in place. Prefer `[...$X, item]`
+      to create a new array. Destructive array methods cause unintended
+      side effects when references are shared.
+    pattern: $X.push(...)
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        push()は配列を破壊的に変更します。スプレッド構文で
+        新しい配列を作成してください。
+
+  - id: immutability.no-array-pop-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      `$X.pop()` mutates the array in place. Prefer `$X.slice(0, -1)`
+      to create a new array without the last element.
+    pattern: $X.pop()
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-array-splice-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      `$X.splice(...)` mutates the array in place. Use `$X.slice()` combined
+      with spread to create a new array with the desired modifications.
+    pattern: $X.splice(...)
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-array-sort-inplace-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      `$X.sort(...)` mutates the array in place. Use `[...$X].sort(...)` or
+      `$X.toSorted(...)` to create a new sorted array.
+    pattern: $X.sort(...)
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-array-reverse-inplace-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      `$X.reverse()` mutates the array in place. Use `[...$X].reverse()` or
+      `$X.toReversed()` to create a new reversed array.
+    pattern: $X.reverse()
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-param-property-mutation-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      Direct mutation of parameter property `$PARAM.$FIELD = $VAL`. Prefer
+      returning a new object: `{ ...$PARAM, $FIELD: $VAL }` to avoid
+      unintended side effects on the caller.
+    pattern: |
+      function $FUNC(..., $PARAM, ...) {
+          ...
+          $PARAM.$FIELD = $VAL
+          ...
+      }
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        関数引数のプロパティを直接変更しています。スプレッド構文で
+        新しいオブジェクトを作成してください。

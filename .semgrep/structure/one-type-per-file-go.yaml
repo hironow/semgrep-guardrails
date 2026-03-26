@@ -1,0 +1,68 @@
+rules:
+  - id: structure.multiple-exported-structs-go
+    languages: [go]
+    severity: WARNING
+    message: >-
+      This file defines multiple exported struct types. The "one public type
+      per file" rule requires each exported type to live in its own file.
+      Move `$NAME2` to a separate file named after the type.
+    patterns:
+      - pattern: |
+          type $NAME1 struct { ... }
+          ...
+          type $NAME2 struct { ... }
+      - metavariable-regex:
+          metavariable: $NAME1
+          regex: ^[A-Z]
+      - metavariable-regex:
+          metavariable: $NAME2
+          regex: ^[A-Z]
+    metadata:
+      category: structure
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        1つのファイルに複数のエクスポートされた構造体型が定義されています。
+        公開型ごとに別ファイルに分離してください。
+
+  - id: structure.multiple-exported-interfaces-go
+    languages: [go]
+    severity: WARNING
+    message: >-
+      This file defines multiple exported interface types. Move `$NAME2`
+      to a separate file named after the type.
+    patterns:
+      - pattern: |
+          type $NAME1 interface { ... }
+          ...
+          type $NAME2 interface { ... }
+      - metavariable-regex:
+          metavariable: $NAME1
+          regex: ^[A-Z]
+      - metavariable-regex:
+          metavariable: $NAME2
+          regex: ^[A-Z]
+    metadata:
+      category: structure
+      rule-origin: ai-tools/COMMON.md
+
+  - id: structure.exported-struct-and-interface-go
+    languages: [go]
+    severity: WARNING
+    message: >-
+      This file defines both an exported struct and an exported interface.
+      Unless the interface is tightly coupled to the struct (e.g., sealed
+      pattern), move one to its own file.
+    patterns:
+      - pattern: |
+          type $NAME1 struct { ... }
+          ...
+          type $NAME2 interface { ... }
+      - metavariable-regex:
+          metavariable: $NAME1
+          regex: ^[A-Z]
+      - metavariable-regex:
+          metavariable: $NAME2
+          regex: ^[A-Z]
+    metadata:
+      category: structure
+      rule-origin: ai-tools/COMMON.md

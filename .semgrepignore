@@ -1,0 +1,2 @@
+# Override default semgrep ignore to allow scanning test files
+# Default semgrep ignores test directories, but we need them for rule testing

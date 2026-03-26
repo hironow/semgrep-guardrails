@@ -1,0 +1,65 @@
+rules:
+  - id: immutability.no-list-append-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM.append(...)` mutates the list argument in place. Prefer creating
+      a new list: `[*$PARAM, item]` to avoid unintended side effects on the caller.
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM.append(...)
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        関数引数のリストに対してappend()を呼び出しています。
+        呼び出し元のリストが意図せず変更されます。新しいリストを作成してください。
+
+  - id: immutability.no-list-extend-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM.extend(...)` mutates the list argument in place. Prefer creating
+      a new list: `[*$PARAM, *other]` to avoid unintended side effects.
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM.extend(...)
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-dict-mutation-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM[$KEY] = $VAL` mutates the dict argument in place. Prefer creating
+      a new dict: `{**$PARAM, key: val}` to avoid unintended side effects.
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM[$KEY] = $VAL
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        関数引数の辞書を直接変更しています。新しい辞書を作成してください。
+
+  - id: immutability.no-list-sort-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM.sort()` mutates the list in place. Use `sorted($PARAM)` to return
+      a new sorted list without modifying the original.
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM.sort(...)
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md

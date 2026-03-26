@@ -1,0 +1,42 @@
+rules:
+  - id: immutability.no-param-slice-append-go
+    languages: [go]
+    severity: WARNING
+    message: >-
+      `append($PARAM, ...)` may mutate the caller's slice if capacity allows.
+      Create an explicit copy before appending to avoid unintended side effects.
+      Example: `newItems := make([]T, len($PARAM)); copy(newItems, $PARAM); newItems = append(newItems, ...)`
+    patterns:
+      - pattern: |
+          return append($PARAM, ...)
+      - pattern-inside: |
+          func $FUNC(..., $PARAM []$TYPE, ...) []$TYPE2 {
+              ...
+          }
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        関数の引数スライスに直接appendすると、呼び出し元のスライスを
+        意図せず変更する可能性があります。明示的にコピーしてから操作してください。
+
+  - id: immutability.no-pointer-field-mutation-go
+    languages: [go]
+    severity: WARNING
+    message: >-
+      Direct mutation of a pointer parameter's field `$PARAM.$FIELD`. Prefer
+      returning a new struct instead of mutating the argument. This improves
+      predictability and makes the code easier to test.
+    patterns:
+      - pattern: |
+          $PARAM.$FIELD = $VAL
+      - pattern-inside: |
+          func $FUNC(..., $PARAM *$TYPE, ...) $RET {
+              ...
+          }
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        ポインタ引数のフィールドを直接変更しています。引数を変更せず、
+        新しい構造体を返すことを推奨します。
