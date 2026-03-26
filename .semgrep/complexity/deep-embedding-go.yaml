@@ -1,0 +1,27 @@
+rules:
+  - id: complexity.deep-embedding-3-levels-go
+    languages: [go]
+    severity: WARNING
+    message: >-
+      Struct `$C` embeds `$B` which embeds `$A`, creating a 3+ level
+      embedding chain. The "Less Is More" rule flags deep hierarchies as
+      a sign of over-engineering. Prefer explicit field composition over
+      deep struct embedding.
+    pattern: |
+      type $A struct { ... }
+      ...
+      type $B struct {
+          $A
+          ...
+      }
+      ...
+      type $C struct {
+          $B
+          ...
+      }
+    metadata:
+      category: complexity
+      rule-origin: ai-tools/COMMON.md (Less Is More)
+      description-ja: >-
+        構造体の埋め込みが3レベル以上です。過度な抽象化の兆候です。
+        明示的なフィールドコンポジションを検討してください。

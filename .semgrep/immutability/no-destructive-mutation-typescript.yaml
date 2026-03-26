@@ -58,6 +58,54 @@ rules:
       category: immutability
       rule-origin: ai-tools/COMMON.md
 
+  - id: immutability.no-array-unshift-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      `$X.unshift(...)` mutates the array in place. Prefer `[item, ...$X]`
+      to create a new array with the element prepended.
+    pattern: $X.unshift(...)
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-array-fill-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      `$X.fill(...)` mutates the array in place. Use `$X.map(() => value)`
+      or `Array.from(...)` to create a new filled array.
+    pattern: $X.fill(...)
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-array-copywithin-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      `$X.copyWithin(...)` mutates the array in place. Create a copy first
+      with `[...$X]` before calling copyWithin.
+    pattern: $X.copyWithin(...)
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-delete-property-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      `delete $X.$PROP` mutates the object in place. Prefer destructuring
+      to create a new object without the property:
+      `const { $PROP, ...rest } = $X`.
+    pattern: delete $X.$PROP
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        deleteはオブジェクトを破壊的に変更します。分割代入で
+        プロパティを除外した新しいオブジェクトを作成してください。
+
   - id: immutability.no-param-property-mutation-typescript
     languages: [typescript, javascript]
     severity: WARNING
@@ -77,3 +125,22 @@ rules:
       description-ja: >-
         関数引数のプロパティを直接変更しています。スプレッド構文で
         新しいオブジェクトを作成してください。
+
+  - id: immutability.no-nested-property-mutation-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      Direct nested mutation `$PARAM.$A.$B = $VAL`. Prefer creating a new
+      object with spread: `{ ...$PARAM, $A: { ...$PARAM.$A, $B: $VAL } }`.
+    pattern: |
+      function $FUNC(..., $PARAM, ...) {
+          ...
+          $PARAM.$A.$B = $VAL
+          ...
+      }
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        ネストされたプロパティの直接変更を検出しました。
+        スプレッド構文で深いコピーを作成してください。

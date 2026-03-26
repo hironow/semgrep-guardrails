@@ -26,3 +26,33 @@ rules:
     metadata:
       category: structure
       rule-origin: ai-tools/COMMON.md
+
+  - id: structure.multiple-exported-type-aliases-typescript
+    languages: [typescript]
+    severity: WARNING
+    message: >-
+      This file exports multiple type aliases (`$NAME1` and `$NAME2`). The
+      "one public type per file" rule requires each exported type to live
+      in its own file.
+    pattern: |
+      export type $NAME1 = $TYPE1
+      ...
+      export type $NAME2 = $TYPE2
+    metadata:
+      category: structure
+      rule-origin: ai-tools/COMMON.md
+
+  - id: structure.mixed-exported-class-and-interface-typescript
+    languages: [typescript]
+    severity: WARNING
+    message: >-
+      This file exports both a class and a type alias. Unless tightly
+      coupled, move one to its own file.
+    patterns:
+      - pattern: |
+          export class $NAME1 { ... }
+          ...
+          export type $NAME2 = $TYPE
+    metadata:
+      category: structure
+      rule-origin: ai-tools/COMMON.md

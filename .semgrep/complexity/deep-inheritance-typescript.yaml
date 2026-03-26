@@ -1,0 +1,21 @@
+rules:
+  - id: complexity.deep-inheritance-3-levels-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      Class `$C` extends `$B` which extends `$A`, creating a 3+ level
+      inheritance hierarchy. The "Less Is More" rule flags inheritance
+      hierarchies of 3+ levels as a sign of over-engineering. Prefer
+      composition over deep inheritance.
+    pattern: |
+      class $A { ... }
+      ...
+      class $B extends $A { ... }
+      ...
+      class $C extends $B { ... }
+    metadata:
+      category: complexity
+      rule-origin: ai-tools/COMMON.md (Less Is More)
+      description-ja: >-
+        継承階層が3レベル以上です。過度な抽象化の兆候です。
+        継承よりコンポジションを検討してください。

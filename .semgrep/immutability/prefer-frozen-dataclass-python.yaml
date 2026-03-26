@@ -1,0 +1,28 @@
+rules:
+  - id: immutability.prefer-frozen-dataclass-python
+    languages: [python]
+    severity: INFO
+    message: >-
+      Consider using `@dataclass(frozen=True)` to make this dataclass
+      immutable. Frozen dataclasses prevent accidental mutation and are
+      hashable by default. Use `dataclasses.replace()` to create modified
+      copies.
+    patterns:
+      - pattern: |
+          @dataclass
+          class $NAME:
+              ...
+      - pattern-not: |
+          @dataclass(frozen=True)
+          class $NAME:
+              ...
+      - pattern-not: |
+          @dataclass(frozen=True, ...)
+          class $NAME:
+              ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+      description-ja: >-
+        @dataclassにfrozen=Trueが指定されていません。不変データクラスを
+        使用することで、予測可能性とスレッド安全性が向上します。

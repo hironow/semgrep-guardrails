@@ -63,3 +63,94 @@ rules:
     metadata:
       category: immutability
       rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-list-insert-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM.insert(...)` mutates the list argument in place. Prefer creating
+      a new list with slicing: `[*$PARAM[:i], item, *$PARAM[i:]]`.
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM.insert(...)
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-list-remove-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM.remove(...)` mutates the list argument in place. Prefer creating
+      a new list: `[x for x in $PARAM if x != val]`.
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM.remove(...)
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-list-clear-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM.clear()` mutates the collection in place. Assign a new empty
+      collection instead of clearing the argument.
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM.clear()
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-list-reverse-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM.reverse()` mutates the list in place. Use `list(reversed($PARAM))`
+      or `$PARAM[::-1]` to create a new reversed list.
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM.reverse()
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-dict-update-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM.update(...)` mutates the dict argument in place. Prefer creating
+      a new dict: `{**$PARAM, **other}` or `$PARAM | other` (Python 3.9+).
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM.update(...)
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
+
+  - id: immutability.no-dict-pop-param-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `$PARAM.pop(...)` mutates the dict/list argument in place. For dicts,
+      use `{k: v for k, v in $PARAM.items() if k != key}`. For lists,
+      use slicing to create a new list.
+    pattern: |
+      def $FUNC(..., $PARAM, ...):
+          ...
+          $PARAM.pop(...)
+          ...
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/COMMON.md
