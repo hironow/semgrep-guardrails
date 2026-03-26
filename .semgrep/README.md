@@ -6,7 +6,7 @@
 
 ```
 .semgrep/
-├── naming/                 # 曖昧なサフィックスを避ける
+├── naming/                 # 曖昧なサフィックス + ゴミ箱パッケージ名
 ├── immutability/           # イミュータブルを推奨
 ├── structure/              # 1ファイルにつき1つの型
 ├── complexity/             # Less Is More (深い継承)
@@ -18,6 +18,9 @@
 ├── clean-architecture/     # Clean Architecture 層依存
 ├── breach-encapsulation/   # Breach Encapsulation Naming
 ├── first-class-collection/ # First Class Collection
+├── repository-design/      # Repository 命名・メソッド設計
+├── repository-placement/   # Repository Interface 配置
+├── backward-compat/        # 後方互換性ガバナンス
 └── tests/
 ```
 
@@ -25,77 +28,64 @@
 
 | Category | Source | Go | Py | TS | Total |
 |---|---|---|---|---|---|
-| naming/ | AGENTS.md: 曖昧なサフィックスを避ける | 2 | 1 | 3 | **6** |
-| immutability/ | AGENTS.md: イミュータブルを推奨 | 2 | 11 | 11 | **24** |
-| structure/ | AGENTS.md: 1ファイルにつき1つの型 | 3 | 1 | 4 | **8** |
-| complexity/ | AGENTS.md: Less Is More | 1 | 1 | 1 | **3** |
-| demeter/ | okite-ai: law-of-demeter | 1 | 1 | 1 | **3** |
-| parse-dont-validate/ | okite-ai: parse-dont-validate | 1 | 2 | 2 | **5** |
-| tell-dont-ask/ | okite-ai: tell-dont-ask | - | 1 | 1 | **2** |
-| domain-primitives/ | okite-ai: domain-primitives | 1 | 1 | 1 | **3** |
-| error-handling/ | okite-ai: error-handling | 2 | 2 | 1 | **5** |
-| clean-architecture/ | okite-ai: clean-architecture | 3 | 2 | 2 | **7** |
-| breach-encapsulation/ | okite-ai: breach-encapsulation-naming | 1 | 1 | 1 | **3** |
-| first-class-collection/ | okite-ai: first-class-collection | 1 | 1 | 1 | **3** |
-| **Total** | | **18** | **25** | **29** | **72** |
+| naming/ | 曖昧なサフィックス + package-design | 3 | 2 | 4 | **9** |
+| immutability/ | イミュータブルを推奨 | 2 | 11 | 11 | **24** |
+| structure/ | 1ファイルにつき1つの型 | 3 | 1 | 4 | **8** |
+| complexity/ | Less Is More | 1 | 1 | 1 | **3** |
+| demeter/ | law-of-demeter | 1 | 1 | 1 | **3** |
+| parse-dont-validate/ | parse-dont-validate | 1 | 2 | 2 | **5** |
+| tell-dont-ask/ | tell-dont-ask | - | 1 | 1 | **2** |
+| domain-primitives/ | domain-primitives | 1 | 1 | 1 | **3** |
+| error-handling/ | error-handling | 2 | 2 | 1 | **5** |
+| clean-architecture/ | clean-architecture | 3 | 2 | 2 | **7** |
+| breach-encapsulation/ | breach-encapsulation-naming | 1 | 1 | 1 | **3** |
+| first-class-collection/ | first-class-collection | 1 | 1 | 1 | **3** |
+| repository-design/ | repository-design | 3 | 3 | 4 | **10** |
+| repository-placement/ | repository-placement | 1 | 1 | 1 | **3** |
+| backward-compat/ | backward-compat-governance | 1 | 1 | 2 | **4** |
+| **Total** | | **24** | **31** | **37** | **92** |
 
-## Rules Detail
+## Source Coverage
 
-### naming/ — Ambiguous Suffix Detection
-Prohibited suffixes: `Manager`, `Util`, `Facade`, `Service`, `Runtime`, `Engine`
+### AGENTS.md (6 rules → 4 semgrep categories)
 
-### immutability/ — Immutable Data Operations
-Detects destructive methods (`push`, `pop`, `splice`, `sort`, `reverse`, `append`, `extend`, `insert`, `remove`, `clear`, `update`, `delete`, etc.), parameter mutations, and mutable dataclasses.
+| Rule | semgrep | Status |
+|------|---------|--------|
+| 曖昧なサフィックスを避ける | naming/ | ✅ |
+| イミュータブルを推奨 | immutability/ | ✅ |
+| 1ファイルにつき1つの型 | structure/ | ✅ |
+| Less Is More | complexity/ | ✅ (継承3+) |
+| Explain Skill Selection | - | ❌ AI行動規範 |
+| コーディング前の学習 | - | ❌ プロセス |
 
-### structure/ — One Public Type Per File
-Detects files with multiple exported/public types.
+### okite-ai/skills/ (32 skills → 11 semgrep categories)
 
-### complexity/ — Less Is More
-Detects 3+ level inheritance/embedding hierarchies.
-
-### demeter/ — Law of Demeter
-Detects triple method chains `a.b().c().d()` ("Train Wreck").
-
-### parse-dont-validate/ — Parse, Don't Validate
-Detects `validate*()` → `void`/`None` and `check*()` → `bool` functions.
-
-### tell-dont-ask/ — Tell, Don't Ask
-Detects `if (obj.getX() == val)` patterns.
-
-### domain-primitives/ — Domain Primitives
-Detects raw `string` fields for domain concepts (email, name, phone, address, url, token, password, secret).
-
-### error-handling/ — Error Handling
-Detects bare `except:`, `except Exception:`, empty `catch` blocks, and ignored error returns.
-
-### clean-architecture/ — Layer Dependency Rules
-Scoped to `**/domain/**`, `**/model/**`, `**/entity/**` paths. Detects imports from:
-- Infrastructure layer (`infrastructure/`, `infra/`)
-- Adapter layer (`adapter/`, `controller/`, `gateway/`, `handler/`, `presenter/`)
-- UseCase layer (`usecase/`, `application/`, `service/`) (Go only, WARNING)
-
-### breach-encapsulation/ — Getter Naming in Domain
-Scoped to `**/domain/**`, `**/model/**`, `**/entity/**` paths (excludes tests and value objects).
-Detects `get*()` / `Get*()` methods that should be `breachEncapsulationOf*()`.
-
-### first-class-collection/ — Raw Collection Fields in Domain
-Scoped to `**/domain/**`, `**/model/**`, `**/entity/**` paths (excludes DTOs).
-Detects raw collection fields (`[]T`, `list[T]`, `T[]`) that should be wrapped in first-class collection types.
+| Skill | semgrep | Status |
+|-------|---------|--------|
+| law-of-demeter | demeter/ | ✅ |
+| parse-dont-validate | parse-dont-validate/ | ✅ |
+| tell-dont-ask | tell-dont-ask/ | ✅ |
+| domain-primitives-and-always-valid | domain-primitives/ | ✅ |
+| error-handling | error-handling/ | ✅ |
+| clean-architecture | clean-architecture/ | ✅ |
+| breach-encapsulation-naming | breach-encapsulation/ | ✅ |
+| first-class-collection | first-class-collection/ | ✅ |
+| repository-design | repository-design/ | ✅ |
+| repository-placement | repository-placement/ | ✅ |
+| backward-compat-governance | backward-compat/ | ✅ |
+| package-design | naming/ (junk-drawer) | ✅ (部分的) |
+| error-classification | - | ❌ 概念定義のみ |
+| aggregate-design | - | ❌ 設計原則 (一部 immutability/ でカバー) |
+| domain-building-blocks | - | ❌ 設計ガイド |
+| when-to-wrap-primitives | - | ❌ 判断フロー (domain-primitives/ が補完) |
+| cqrs-*/ddd-*/cross-aggregate-* | - | ❌ 設計パターン |
+| reviewing-skills/creating-rules | - | ❌ メタスキル |
+| CC-SDD | - | ❌ プロセス |
 
 ## Usage
 
 ```bash
-semgrep --config .semgrep/ <target>           # All rules
+semgrep --config .semgrep/ <target>           # All 92 rules
 semgrep --config .semgrep/naming/ <target>    # Specific category
 semgrep --validate --config .semgrep/         # Validate rules
 ```
-
-## Rules NOT Converted
-
-| Rule | Reason |
-|------|--------|
-| Explain Skill Selection | AI behavioral rule, not code |
-| Learn Before Coding | Process workflow, not code |
-| CC-SDD (Spec-Driven Dev) | Process/workflow rule |
-| Less Is More (YAGNI/KISS general) | Too abstract for pattern matching |
-| Less Is More (single-impl interface) | Requires whole-project analysis |
