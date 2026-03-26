@@ -3,116 +3,115 @@ rules:
     languages: [typescript, javascript]
     severity: WARNING
     message: >-
-      `$X.push(...)` mutates the array in place. Prefer `[...$X, item]`
-      to create a new array. Destructive array methods cause unintended
-      side effects when references are shared.
+      [WHY] `$X.push(...)` mutates the array in place. Any other reference to
+      this array will see the change, causing unpredictable side effects.
+      [HOW] Create a new array: `const newArr = [...$X, item]`.
     pattern: $X.push(...)
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        push()は配列を破壊的に変更します。スプレッド構文で
-        新しい配列を作成してください。
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
 
   - id: immutability.no-array-pop-typescript
     languages: [typescript, javascript]
     severity: WARNING
     message: >-
-      `$X.pop()` mutates the array in place. Prefer `$X.slice(0, -1)`
-      to create a new array without the last element.
+      [WHY] `$X.pop()` mutates the array in place and returns the removed element.
+      [HOW] Create a new array without the last element: `const newArr = $X.slice(0, -1)`.
     pattern: $X.pop()
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
-
-  - id: immutability.no-array-splice-typescript
-    languages: [typescript, javascript]
-    severity: WARNING
-    message: >-
-      `$X.splice(...)` mutates the array in place. Use `$X.slice()` combined
-      with spread to create a new array with the desired modifications.
-    pattern: $X.splice(...)
-    metadata:
-      category: immutability
-      rule-origin: ai-tools/COMMON.md
-
-  - id: immutability.no-array-sort-inplace-typescript
-    languages: [typescript, javascript]
-    severity: WARNING
-    message: >-
-      `$X.sort(...)` mutates the array in place. Use `[...$X].sort(...)` or
-      `$X.toSorted(...)` to create a new sorted array.
-    pattern: $X.sort(...)
-    metadata:
-      category: immutability
-      rule-origin: ai-tools/COMMON.md
-
-  - id: immutability.no-array-reverse-inplace-typescript
-    languages: [typescript, javascript]
-    severity: WARNING
-    message: >-
-      `$X.reverse()` mutates the array in place. Use `[...$X].reverse()` or
-      `$X.toReversed()` to create a new reversed array.
-    pattern: $X.reverse()
-    metadata:
-      category: immutability
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
 
   - id: immutability.no-array-unshift-typescript
     languages: [typescript, javascript]
     severity: WARNING
     message: >-
-      `$X.unshift(...)` mutates the array in place. Prefer `[item, ...$X]`
-      to create a new array with the element prepended.
+      [WHY] `$X.unshift(...)` mutates the array in place by prepending elements.
+      [HOW] Create a new array: `const newArr = [item, ...$X]`.
     pattern: $X.unshift(...)
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
+
+  - id: immutability.no-array-splice-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      [WHY] `$X.splice(...)` mutates the array in place by removing/inserting elements.
+      [HOW] Use `$X.toSpliced(...)` (ES2023) or combine slice + spread to build a new array:
+      `const newArr = [...$X.slice(0, start), ...items, ...$X.slice(end)]`.
+    pattern: $X.splice(...)
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
 
   - id: immutability.no-array-fill-typescript
     languages: [typescript, javascript]
     severity: WARNING
     message: >-
-      `$X.fill(...)` mutates the array in place. Use `$X.map(() => value)`
-      or `Array.from(...)` to create a new filled array.
+      [WHY] `$X.fill(...)` mutates the array in place by overwriting elements.
+      [HOW] Create a new filled array: `const newArr = $X.map(() => value)` or
+      `Array.from({length: n}, () => value)`.
     pattern: $X.fill(...)
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
 
   - id: immutability.no-array-copywithin-typescript
     languages: [typescript, javascript]
     severity: WARNING
     message: >-
-      `$X.copyWithin(...)` mutates the array in place. Create a copy first
-      with `[...$X]` before calling copyWithin.
+      [WHY] `$X.copyWithin(...)` mutates the array in place by copying elements within it.
+      [HOW] Create a copy first: `const newArr = [...$X]; newArr.copyWithin(...)`.
     pattern: $X.copyWithin(...)
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
+
+  - id: immutability.no-array-sort-inplace-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      [WHY] `$X.sort(...)` mutates the array in place. Callers sharing a reference to the
+      same array will unexpectedly see a different order.
+      [HOW] Use `$X.toSorted(...)` (ES2023) or `[...$X].sort(...)` to sort a copy.
+    pattern: $X.sort(...)
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
+
+  - id: immutability.no-array-reverse-inplace-typescript
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      [WHY] `$X.reverse()` mutates the array in place.
+      [HOW] Use `$X.toReversed()` (ES2023) or `[...$X].reverse()` to reverse a copy.
+    pattern: $X.reverse()
+    metadata:
+      category: immutability
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
 
   - id: immutability.no-delete-property-typescript
     languages: [typescript, javascript]
     severity: WARNING
     message: >-
-      `delete $X.$PROP` mutates the object in place. Prefer destructuring
-      to create a new object without the property:
+      [WHY] `delete $X.$PROP` mutates the object in place by removing a property.
+      Other code holding a reference to the object will lose the property.
+      [HOW] Use destructuring to create a new object without the property:
       `const { $PROP, ...rest } = $X`.
     pattern: delete $X.$PROP
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        deleteはオブジェクトを破壊的に変更します。分割代入で
-        プロパティを除外した新しいオブジェクトを作成してください。
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
 
   - id: immutability.no-param-property-mutation-typescript
     languages: [typescript, javascript]
     severity: WARNING
     message: >-
-      Direct mutation of parameter property `$PARAM.$FIELD = $VAL`. Prefer
-      returning a new object: `{ ...$PARAM, $FIELD: $VAL }` to avoid
-      unintended side effects on the caller.
+      [WHY] Assigning to `$PARAM.$FIELD` inside a function mutates the caller's object.
+      This breaks the expectation that a function only returns a result without side effects.
+      [HOW] Return a new object with the spread operator:
+      `return { ...$PARAM, $FIELD: $VAL }`.
     pattern: |
       function $FUNC(..., $PARAM, ...) {
           ...
@@ -121,17 +120,17 @@ rules:
       }
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        関数引数のプロパティを直接変更しています。スプレッド構文で
-        新しいオブジェクトを作成してください。
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
 
   - id: immutability.no-nested-property-mutation-typescript
     languages: [typescript, javascript]
     severity: WARNING
     message: >-
-      Direct nested mutation `$PARAM.$A.$B = $VAL`. Prefer creating a new
-      object with spread: `{ ...$PARAM, $A: { ...$PARAM.$A, $B: $VAL } }`.
+      [WHY] Nested mutation `$PARAM.$A.$B = $VAL` modifies a deeply nested property of the
+      caller's object. This is especially dangerous because the mutation is hidden behind
+      multiple levels of indirection.
+      [HOW] Return a new object with nested spread:
+      `return { ...$PARAM, $A: { ...$PARAM.$A, $B: $VAL } }`.
     pattern: |
       function $FUNC(..., $PARAM, ...) {
           ...
@@ -140,7 +139,4 @@ rules:
       }
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        ネストされたプロパティの直接変更を検出しました。
-        スプレッド構文で深いコピーを作成してください。
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨

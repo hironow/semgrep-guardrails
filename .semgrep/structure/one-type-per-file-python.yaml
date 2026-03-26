@@ -3,9 +3,12 @@ rules:
     languages: [python]
     severity: WARNING
     message: >-
-      This file defines multiple module-level classes (`$NAME1` and `$NAME2`).
-      The "one public type per file" rule requires each public class to live
-      in its own file. Move `$NAME2` to a separate module.
+      [WHY] This file defines multiple module-level classes (`$NAME1` and `$NAME2`).
+      In Python, every module-level class is effectively public. Co-locating multiple
+      classes bloats the file, obscures responsibility, and makes Git history harder
+      to trace per-type.
+      [HOW] Move `$NAME2` to its own module named after the class
+      (e.g., order_repository.py). Private helper classes (prefixed with `_`) may stay.
     patterns:
       - pattern-either:
           - pattern: |
@@ -40,7 +43,4 @@ rules:
           regex: ^[A-Z]
     metadata:
       category: structure
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        1つのファイルに複数のモジュールレベルクラスが定義されています。
-        公開クラスごとに別ファイルに分離してください。
+      rule-origin: ai-tools/AGENTS.md - 1ファイルにつき1つの型

@@ -3,51 +3,53 @@ rules:
     languages: [typescript, javascript]
     severity: WARNING
     message: >-
-      This file exports multiple classes (`$NAME1` and `$NAME2`). The "one
-      public type per file" rule requires each exported class to live in its
-      own file. Move `$NAME2` to a separate module.
+      [WHY] This file exports multiple classes (`$NAME1` and `$NAME2`). Each exported
+      class is a public contract. Co-locating them makes the file responsible for
+      multiple concerns, hurts navigation, and tangles Git history.
+      [HOW] Move `$NAME2` to its own module. Internal/private classes (not exported)
+      may remain if they serve only the primary exported type.
     pattern: |
       export class $NAME1 { ... }
       ...
       export class $NAME2 { ... }
     metadata:
       category: structure
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        1つのファイルに複数のエクスポートされたクラスが定義されています。
-        公開型ごとに別ファイルに分離してください。
+      rule-origin: ai-tools/AGENTS.md - 1ファイルにつき1つの型
 
   - id: structure.multiple-exported-interfaces-typescript
     languages: [typescript]
     severity: WARNING
     message: >-
-      This file exports multiple interfaces. Move one to a separate module.
+      [WHY] This file exports multiple interfaces, mixing distinct public contracts.
+      [HOW] Move one interface to its own module for cleaner navigation and history.
     pattern-regex: "(?s)export\\s+interface\\s+\\w+\\s*\\{[^}]*\\}.*export\\s+interface\\s+\\w+\\s*\\{"
     metadata:
       category: structure
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - 1ファイルにつき1つの型
 
   - id: structure.multiple-exported-type-aliases-typescript
     languages: [typescript]
     severity: WARNING
     message: >-
-      This file exports multiple type aliases (`$NAME1` and `$NAME2`). The
-      "one public type per file" rule requires each exported type to live
-      in its own file.
+      [WHY] This file exports multiple type aliases (`$NAME1` and `$NAME2`). Each
+      exported type is a public contract that deserves its own file.
+      [HOW] Move `$NAME2` to its own module. Small helper types used only by the
+      primary type may stay.
     pattern: |
       export type $NAME1 = $TYPE1
       ...
       export type $NAME2 = $TYPE2
     metadata:
       category: structure
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - 1ファイルにつき1つの型
 
-  - id: structure.mixed-exported-class-and-interface-typescript
+  - id: structure.mixed-exported-class-and-type-typescript
     languages: [typescript]
     severity: WARNING
     message: >-
-      This file exports both a class and a type alias. Unless tightly
-      coupled, move one to its own file.
+      [WHY] This file exports both a class and a type alias, mixing two public contracts.
+      [HOW] Move the type alias to its own module unless it is tightly coupled to the class
+      (e.g., the class's constructor options type).
     patterns:
       - pattern: |
           export class $NAME1 { ... }
@@ -55,4 +57,4 @@ rules:
           export type $NAME2 = $TYPE
     metadata:
       category: structure
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - 1ファイルにつき1つの型

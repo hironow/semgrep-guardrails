@@ -3,10 +3,13 @@ rules:
     languages: [python]
     severity: WARNING
     message: >-
-      Class `$C` inherits from `$B` which inherits from `$A`, creating a 3+
-      level inheritance hierarchy. The "Less Is More" rule flags inheritance
-      hierarchies of 3+ levels as a sign of over-engineering. Prefer
-      composition over deep inheritance.
+      [WHY] Class `$C` inherits from `$B` which inherits from `$A`, creating a 3+ level
+      inheritance hierarchy. Deep inheritance makes behavior hard to predict (method
+      resolution order surprises), tightly couples all levels, and is a classic sign of
+      over-abstraction flagged by the "Less Is More" rule.
+      [HOW] Favor composition over inheritance. Have `$C` hold an instance of `$B` (or
+      share a protocol/ABC) rather than extending it. Apply the 3-time rule: only abstract
+      when the pattern has genuinely appeared 3+ times.
     pattern: |
       class $A:
           ...
@@ -18,7 +21,4 @@ rules:
           ...
     metadata:
       category: complexity
-      rule-origin: ai-tools/COMMON.md (Less Is More)
-      description-ja: >-
-        継承階層が3レベル以上です。過度な抽象化の兆候です。
-        継承よりコンポジションを検討してください。
+      rule-origin: ai-tools/AGENTS.md - Less Is More (継承階層が3+レベル)

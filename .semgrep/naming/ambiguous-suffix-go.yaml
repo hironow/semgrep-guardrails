@@ -3,15 +3,18 @@ rules:
     languages: [go]
     severity: WARNING
     message: >-
-      Type `$NAME` uses an ambiguous suffix. Avoid Manager, Util, Facade,
-      Service, Runtime, Engine in new type names. Consider a more specific
-      name based on its responsibility:
-      Data -> Registry/Catalog/Store,
-      Selection -> Policy/Selector/Router,
-      Coordination -> Coordinator/Dispatcher/Controller,
-      Creation -> Factory/Builder,
-      Transformation -> Adapter/Bridge/Mapper,
-      Execution -> Executor/Scheduler/Evaluator.
+      [WHY] Type `$NAME` uses a prohibited suffix (Manager/Util/Facade/Service/Runtime/Engine).
+      These suffixes attract unrelated responsibilities, causing the type to grow into a
+      "god object" with blurred boundaries. The name alone should convey what the type IS,
+      not vaguely what it DOES.
+      [HOW] Replace with a responsibility-specific name:
+      Data storage → Registry/Catalog/Store,
+      Selection/routing → Policy/Selector/Router,
+      Coordination → Coordinator/Dispatcher/Controller,
+      Creation → Factory/Builder,
+      Transformation → Adapter/Bridge/Mapper,
+      Execution → Executor/Scheduler/Evaluator.
+      Exception: names derived from external frameworks/APIs need not be renamed.
     patterns:
       - pattern: type $NAME struct { ... }
       - metavariable-regex:
@@ -19,18 +22,18 @@ rules:
           regex: ^[A-Z].*(?:Manager|Util|Facade|Service|Runtime|Engine)$
     metadata:
       category: naming
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        曖昧なサフィックス(Manager, Util, Facade, Service, Runtime, Engine)を
-        持つ型名を検出します。責務に応じた具体的な命名を使用してください。
+      rule-origin: ai-tools/AGENTS.md - 曖昧なサフィックスを避ける
 
   - id: naming.ambiguous-suffix-interface-go
     languages: [go]
     severity: WARNING
     message: >-
-      Interface `$NAME` uses an ambiguous suffix. Avoid Manager, Util, Facade,
-      Service, Runtime, Engine in new type names. Use a name that reflects
-      the specific responsibility.
+      [WHY] Interface `$NAME` uses a prohibited suffix (Manager/Util/Facade/Service/Runtime/Engine).
+      Ambiguous interface names hide the contract: callers cannot infer what operations are
+      valid or which layer this belongs to.
+      [HOW] Rename to express the interface's contract precisely. Go convention favors
+      single-method interfaces named after the verb (Reader, Writer, Closer). For richer
+      contracts, use responsibility-based suffixes: Store, Policy, Router, Coordinator, etc.
     patterns:
       - pattern: type $NAME interface { ... }
       - metavariable-regex:
@@ -38,4 +41,4 @@ rules:
           regex: ^[A-Z].*(?:Manager|Util|Facade|Service|Runtime|Engine)$
     metadata:
       category: naming
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - 曖昧なサフィックスを避ける

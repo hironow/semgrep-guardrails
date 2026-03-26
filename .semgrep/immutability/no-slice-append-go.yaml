@@ -3,9 +3,12 @@ rules:
     languages: [go]
     severity: WARNING
     message: >-
-      `append($PARAM, ...)` may mutate the caller's slice if capacity allows.
-      Create an explicit copy before appending to avoid unintended side effects.
-      Example: `newItems := make([]T, len($PARAM)); copy(newItems, $PARAM); newItems = append(newItems, ...)`
+      [WHY] `append($PARAM, ...)` on a parameter slice may silently mutate the caller's
+      underlying array when spare capacity exists. This causes hard-to-trace bugs because
+      the mutation depends on runtime capacity, not visible code structure.
+      [HOW] Create an explicit copy before appending:
+      `newItems := make([]T, len($PARAM)); copy(newItems, $PARAM); return append(newItems, ...)`
+      Or use `slices.Clone($PARAM)` (Go 1.21+) for clarity.
     patterns:
       - pattern: |
           return append($PARAM, ...)
@@ -15,18 +18,18 @@ rules:
           }
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        関数の引数スライスに直接appendすると、呼び出し元のスライスを
-        意図せず変更する可能性があります。明示的にコピーしてから操作してください。
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨
 
   - id: immutability.no-pointer-field-mutation-go
     languages: [go]
     severity: WARNING
     message: >-
-      Direct mutation of a pointer parameter's field `$PARAM.$FIELD`. Prefer
-      returning a new struct instead of mutating the argument. This improves
-      predictability and makes the code easier to test.
+      [WHY] Mutating a pointer parameter's field `$PARAM.$FIELD` changes the caller's
+      data in place. This breaks referential transparency, makes the function harder to
+      test, and introduces hidden coupling between caller and callee.
+      [HOW] Accept the struct by value and return a new struct:
+      `func UpdateX(x X, ...) X { return X{Field: newVal, ...} }`
+      If the struct is large and copying is expensive, document the mutation explicitly.
     patterns:
       - pattern: |
           $PARAM.$FIELD = $VAL
@@ -36,7 +39,4 @@ rules:
           }
     metadata:
       category: immutability
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        ポインタ引数のフィールドを直接変更しています。引数を変更せず、
-        新しい構造体を返すことを推奨します。
+      rule-origin: ai-tools/AGENTS.md - イミュータブルを推奨

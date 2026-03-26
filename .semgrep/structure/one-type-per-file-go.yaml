@@ -3,9 +3,11 @@ rules:
     languages: [go]
     severity: WARNING
     message: >-
-      This file defines multiple exported struct types. The "one public type
-      per file" rule requires each exported type to live in its own file.
-      Move `$NAME2` to a separate file named after the type.
+      [WHY] This file defines multiple exported struct types. When a file contains more
+      than one public type, it becomes harder to navigate (filename != type name), Git
+      blame loses precision, and responsibilities blur as the file grows.
+      [HOW] Move `$NAME2` to its own file named after the type (e.g., order_repository.go).
+      Private helper types used by the main type may stay in the same file.
     patterns:
       - pattern: |
           type $NAME1 struct { ... }
@@ -19,17 +21,15 @@ rules:
           regex: ^[A-Z]
     metadata:
       category: structure
-      rule-origin: ai-tools/COMMON.md
-      description-ja: >-
-        1つのファイルに複数のエクスポートされた構造体型が定義されています。
-        公開型ごとに別ファイルに分離してください。
+      rule-origin: ai-tools/AGENTS.md - 1ファイルにつき1つの型
 
   - id: structure.multiple-exported-interfaces-go
     languages: [go]
     severity: WARNING
     message: >-
-      This file defines multiple exported interface types. Move `$NAME2`
-      to a separate file named after the type.
+      [WHY] Multiple exported interfaces in one file makes it unclear which interface
+      is the file's primary contract. Each interface deserves its own file for discoverability.
+      [HOW] Move `$NAME2` to a separate file named after the interface.
     patterns:
       - pattern: |
           type $NAME1 interface { ... }
@@ -43,15 +43,18 @@ rules:
           regex: ^[A-Z]
     metadata:
       category: structure
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - 1ファイルにつき1つの型
 
   - id: structure.exported-struct-and-interface-go
     languages: [go]
     severity: WARNING
     message: >-
-      This file defines both an exported struct and an exported interface.
-      Unless the interface is tightly coupled to the struct (e.g., sealed
-      pattern), move one to its own file.
+      [WHY] This file defines both an exported struct and an exported interface, mixing
+      two distinct public contracts. Unless they form a sealed pair, this violates the
+      one-public-type-per-file rule.
+      [HOW] Move either the struct or the interface to its own file. If the interface
+      is the struct's contract (e.g., a mock target), consider whether they truly need
+      to be co-located.
     patterns:
       - pattern: |
           type $NAME1 struct { ... }
@@ -65,4 +68,4 @@ rules:
           regex: ^[A-Z]
     metadata:
       category: structure
-      rule-origin: ai-tools/COMMON.md
+      rule-origin: ai-tools/AGENTS.md - 1ファイルにつき1つの型
