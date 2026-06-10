@@ -1,0 +1,4 @@
+gitignore: true
+# submodules/ is vendored upstream markdown we do not own.
+ignores:
+  - submodules/**

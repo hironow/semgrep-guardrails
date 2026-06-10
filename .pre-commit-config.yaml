@@ -1,0 +1,57 @@
+# prek (j178/prek) -- Rust reimplementation of pre-commit. See ~/dotfiles.
+# Install: just install-hooks   (mise exec -- prek install -t pre-commit -t pre-push)
+# Run all: just pre-commit      (mise exec -- prek run --all-files)
+minimum_prek_version: "0.4.0"
+
+# submodules/ is vendored upstream content; .semgrep/tests/ holds rule fixtures
+# whose "bad" code (trailing whitespace, fake secrets) is intentional test data
+# that formatting/secret hooks must never rewrite or flag.
+exclude: |
+  (?x)^(
+    submodules/|
+    \.semgrep/tests/
+  )
+
+repos:
+  # Rust-native builtin hooks (fast, no external repo clone).
+  - repo: builtin
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # Local hooks delegate to just recipes so the same checks run from the CLI
+  # (`just fmt`, `just lint`) and from prek.
+  - repo: local
+    hooks:
+      - id: just-fmt
+        name: just fmt
+        entry: just fmt
+        language: system
+        pass_filenames: false
+        files: '\.md$'
+        description: Auto-format markdown (markdownlint-cli2 --fix).
+      - id: just-lint
+        name: just lint
+        entry: just lint
+        language: system
+        pass_filenames: false
+        files: '\.md$'
+        description: Lint markdown (markdownlint-cli2 --fix).
+
+  # pre-push: strict no-write gate (markdown + semgrep rule validation + fixtures).
+  - repo: local
+    hooks:
+      - id: just-check
+        name: just check
+        entry: just check
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        description: Strict gate (markdownlint, semgrep --validate, fixture smoke test).
